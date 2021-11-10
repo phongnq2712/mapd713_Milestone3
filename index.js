@@ -35,12 +35,12 @@ db.once('open', function() {
 
 // Patient Schema.
 var patientSchema = new mongoose.Schema({
-		firstName: String, 
-		lastName: String, 
-		age: Number,
-		gender: String,
-		healthInsuranceNo: String,
-		phoneNo: String,
+    firstName: String, 
+    lastName: String, 
+    age: Number,
+    gender: String,
+    healthInsuranceNo: String,
+    phoneNo: String,
     email:String
 });
 
@@ -48,22 +48,31 @@ var patientSchema = new mongoose.Schema({
 // nonexistent) the 'Patients' collection in the MongoDB database
 var Patient = mongoose.model('Patient', patientSchema);
 
+var patientRecordsSchema = new mongoose.Schema({
+  patientId: String,
+  bloodPressure: String,
+  respiratoryRate: String,
+  bloodOxygenLevel: String,
+  heartBeatRate: String
+});
+var PatientRecords = mongoose.model('Patient-records', patientRecordsSchema);
+
 var errors = require('restify-errors');
 var restify = require('restify')
   // Create the restify server
   , server = restify.createServer({ name: SERVER_NAME})
 
-	if (typeof ipaddress === "undefined") {
-		//  Log errors on OpenShift but continue w/ 127.0.0.1 - this
-		//  allows us to run/test the app locally.
-		console.warn('No process.env.IP var, using default: ' + DEFAULT_HOST);
-		ipaddress = DEFAULT_HOST;
-	};
+  if (typeof ipaddress === "undefined") {
+    //  Log errors on OpenShift but continue w/ 127.0.0.1 - this
+    //  allows us to run/test the app locally.
+    console.warn('No process.env.IP var, using default: ' + DEFAULT_HOST);
+    ipaddress = DEFAULT_HOST;
+  };
 
-	if (typeof port === "undefined") {
-		console.warn('No process.env.PORT var, using default port: ' + DEFAULT_PORT);
-		port = DEFAULT_PORT;
-	};
+  if (typeof port === "undefined") {
+    console.warn('No process.env.PORT var, using default port: ' + DEFAULT_PORT);
+    port = DEFAULT_PORT;
+  };
   
   
   server.listen(port, ipaddress, function () {
@@ -151,5 +160,21 @@ var restify = require('restify')
       if (error) return next(new Error(JSON.stringify(error.errors)))
       // Send the patient if no issues
       res.send(201, result)
+    })
+  })
+
+  // 4. Get a single patient records by their patient id
+  server.get('/clinical_records/:id', function (req, res, next) {
+    console.log('GET request: clinical_records/' + req.params.id);
+
+    // Find a single patient by their id
+    PatientRecords.find({ patientId: req.params.id }).exec(function (error, patientRecords) {
+      if (patientRecords) {
+        // Send the patient if no issues
+        res.send(patientRecords)
+      } else {
+        // Send 404 header if the patient doesn't exist
+        res.send(404)
+      }
     })
   })
