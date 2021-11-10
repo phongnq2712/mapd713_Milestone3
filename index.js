@@ -178,3 +178,32 @@ var restify = require('restify')
       }
     })
   })
+
+  // 5. Create a new clinical records' patient
+  server.post('/clinical_records', function (req, res, next) {
+    console.log('POST request: clinical_records params=>' + JSON.stringify(req.params));
+    console.log('POST request: clinical_records body=>' + JSON.stringify(req.body));
+    // Make patientId is defined
+    if (req.body.patientId === undefined) {
+      // If there are any errors, pass them to next in the correct format
+      return next(new errors.BadRequestError('patientId must be supplied'))
+    }
+    
+    // Creating new clinical records.
+    var newPatientRecords = new PatientRecords({
+      patientId: req.body.patientId,
+      bloodPressure: req.body.bloodPressure,
+      respiratoryRate: req.body.respiratoryRate,
+      gender: req.body.gender,
+      bloodOxygenLevel: req.body.bloodOxygenLevel,
+      heartBeatRate: req.body.heartBeatRate
+    });
+
+    // Create the clinical records and saving to db
+    newPatientRecords.save(function (error, result) {
+      // If there are any errors, pass them to next in the correct format
+      if (error) return next(new Error(JSON.stringify(error.errors)))
+      // Send the patient if no issues
+      res.send(201, result)
+    })
+  })
