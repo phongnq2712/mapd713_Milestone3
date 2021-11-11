@@ -11,15 +11,15 @@ var SERVER_NAME = 'healthrecords'
 
 var http = require ('http');
 var mongoose = require ("mongoose");
+const dotenv = require("dotenv")
+dotenv.config()
 
 var port = process.env.PORT;
 var ipaddress = process.env.IP;
 
 // Here we find an appropriate database to connect to, defaulting to
 // localhost if we don't find one.
-var uristring = 
-  process.env.MONGODB_URI || 
-  'mongodb+srv://lkZac4WrRc5Jl8ZQ:lkZac4WrRc5Jl8ZQ@cluster0.xwahq.mongodb.net/patients-db?retryWrites=true&w=majority';
+var uristring = process.env.MONGODB_URI;
 
 // Makes connection asynchronously.  Mongoose will queue up database
 // operations and release them when the connection is complete.
