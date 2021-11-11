@@ -43,10 +43,18 @@ var patientSchema = new mongoose.Schema({
     phoneNo: String,
     email:String
 });
+// Task Schema.
+var taskSchema = new mongoose.Schema({
+  taskId: Number, 
+  taskName: String, 
+  time: String,
+  status:String,
+});
 
 // Compiles the schema into a model, opening (or creating, if
 // nonexistent) the 'Patients' collection in the MongoDB database
 var Patient = mongoose.model('Patient', patientSchema);
+var Task = mongoose.model('Task', taskSchema);
 
 var patientRecordsSchema = new mongoose.Schema({
   patientId: String,
@@ -210,5 +218,29 @@ var restify = require('restify')
       if (error) return next(new Error(JSON.stringify(error.errors)))
       // Send the patient if no issues
       res.send(201, result)
+    })
+  })
+
+  // 6. Get all tasks
+  server.get('/tasks', function (req, res, next) {
+    console.log('GET request: /tasks');
+    // Find every entity within the given collection
+    Task.find({}).exec(function (error, result) {
+      if (error) return next(new Error(JSON.stringify(error.errors)))
+      res.send(result);
+    });
+  })
+  // 7. Get one task
+  server.get('/tasks/:id', function (req, res, next) {
+    console.log('GET request: /tasks/:id');
+    Task.find({ _id: req.params.id }).exec(function (error, task) {
+      if (error) return next(new Error(JSON.stringify(error.errors)))
+      if (task) {
+        // Send the task if no issues
+        res.send(task)
+      } else {
+        // Send 404 header if the task doesn't exist
+        res.send(404)
+      }
     })
   })
