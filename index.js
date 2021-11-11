@@ -256,17 +256,17 @@ server.post('/users/login', function (req, res, next) {
 
   // 7. Create a new clinical records' patient
   server.post('/patients/:id/clinical-records', function (req, res, next) {
-    console.log('POST request: /patients/:id/clinical-records params=>' + JSON.stringify(req.params));
+    console.log('POST request: /patients/:id/clinical-records params=>' + JSON.stringify(req.params.id));
     console.log('POST request: /patients/:id/clinical-records body=>' + JSON.stringify(req.body));
     // Make patientId is defined
-    if (req.body.patientId === undefined) {
+    if (req.params.id === undefined) {
       // If there are any errors, pass them to next in the correct format
-      return next(new errors.BadRequestError('patientId must be supplied'))
+      return next(new errors.BadRequestError('id must be supplied'))
     }
     
     // Creating new clinical records.
     var newPatientRecords = new PatientRecords({
-      patientId: req.body.patientId,
+      patientId: req.params.id,
       bloodPressure: req.body.bloodPressure,
       respiratoryRate: req.body.respiratoryRate,
       gender: req.body.gender,
