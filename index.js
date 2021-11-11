@@ -103,8 +103,8 @@ var restify = require('restify')
   console.log(' GET:  /patients/:id')
   console.log(' GET:  /patients/:id/clinical-records')
   console.log(' POST: /patients/:id/clinical-records')
-  console.log(' GET:  /users/:userId//tasks')
-  console.log(' GET;  /users/:userId//tasks/:id')
+  console.log(' GET:  /users/:userId/tasks')
+  console.log(' GET;  /users/:userId/tasks/:id')
 })
 
 
