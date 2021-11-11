@@ -223,11 +223,35 @@ var restify = require('restify')
 
   // 6. Get all tasks of a user
   server.get('/users/:userId/tasks', function (req, res, next) {
-    console.log('GET request: /tasks');
+    console.log('GET request: /tasks'+req.params.userId);
     // Find every entity within the given collection
     Task.find({userId: req.params.userId }).exec(function (error, result) {
       if (error) return next(new Error(JSON.stringify(error.errors)))
       res.send(result);
+    })
+  })
+
+  //just for data insert
+  server.post('/users/:userId/tasks', function (req, res, next) {
+    console.log('POST request: /tasks/' + req.params.userId + '/tasks');
+
+    if (req.params.userId === undefined) {
+      // If there are any errors, pass them to next in the correct format
+      return next(new errors.BadRequestError('useId must be supplied'))
+    }
+    
+    // Creating new clinical records.
+    var newTasks = new Task({
+      userId: req.params.userId,
+      taskName: req.body.taskName,
+      time: req.body.time,
+      status: req.body.status,
+    });
+
+    newTasks.save(function (error, result) {
+      if (error) return next(new Error(JSON.stringify(error.errors)))
+  
+      res.send(200, result)
     })
   })
   // 7. Get one task of a user
@@ -244,3 +268,5 @@ var restify = require('restify')
       }
     })
   })
+
+
