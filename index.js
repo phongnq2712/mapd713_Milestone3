@@ -317,7 +317,7 @@ server.post('/users/login', function (req, res, next) {
     })
   })
   // 9. Get one task of a user
-  server.get('/users/:userId//tasks/:id', function (req, res, next) {
+  server.get('/users/:userId/tasks/:id', function (req, res, next) {
     console.log('GET request: /tasks/:id');
     Task.find({ _id: req.params.id }).exec(function (error, task) {
       if (error) return next(new Error(JSON.stringify(error.errors)))
