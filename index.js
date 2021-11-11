@@ -86,13 +86,13 @@ var restify = require('restify')
   server.listen(port, ipaddress, function () {
   console.log('Server %s listening at %s', server.name, server.url)
   console.log('Resources:')
-  console.log(' GET: /patients')
+  console.log(' GET:  /patients')
   console.log(' POST: /patients')
-  console.log(' GET: /patients/:id')
-  console.log(' GET: /patients/:id/clinical-records')
+  console.log(' GET:  /patients/:id')
+  console.log(' GET:  /patients/:id/clinical-records')
   console.log(' POST: /patients/:id/clinical-records')
-  console.log(' GET: /tasks')
-  console.log(' GET; /tasks/:id')
+  console.log(' GET:  /users/:userId//tasks')
+  console.log(' GET;  /users/:userId//tasks/:id')
 })
 
 
@@ -222,7 +222,7 @@ var restify = require('restify')
   })
 
   // 6. Get all tasks
-  server.get('/tasks', function (req, res, next) {
+  server.get('/users/:userId/tasks', function (req, res, next) {
     console.log('GET request: /tasks');
     // Find every entity within the given collection
     Task.find({}).exec(function (error, result) {
@@ -231,7 +231,7 @@ var restify = require('restify')
     });
   })
   // 7. Get one task
-  server.get('/tasks/:id', function (req, res, next) {
+  server.get('/users/:userId//tasks/:id', function (req, res, next) {
     console.log('GET request: /tasks/:id');
     Task.find({ _id: req.params.id }).exec(function (error, task) {
       if (error) return next(new Error(JSON.stringify(error.errors)))
