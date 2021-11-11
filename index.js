@@ -32,6 +32,15 @@ db.once('open', function() {
   console.log("!!!! Connected to db: " + uristring)
 });
 
+// User Schema.
+var userSchema = new mongoose.Schema({
+  userId: String, 
+  userName: String, 
+  password:String,
+  position: String,
+  created_time: Date,
+  login_token: String,
+});
 
 // Patient Schema.
 var patientSchema = new mongoose.Schema({
@@ -55,6 +64,7 @@ var taskSchema = new mongoose.Schema({
 // nonexistent) the 'Patients' collection in the MongoDB database
 var Patient = mongoose.model('Patient', patientSchema);
 var Task = mongoose.model('Task', taskSchema);
+var User = mongoose.model('User', userSchema);
 
 var patientRecordsSchema = new mongoose.Schema({
   patientId: String,
@@ -109,8 +119,52 @@ var restify = require('restify')
         return next();
       }
 );
+function generateToken(length) {
+    var result = '';
+    var characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+// 1. register in the system
+server.post('/users/register', function (req, res, next) {
+  console.log('POST request: /users/register');
+  if (req.body.userName === undefined) {
+    return next(new errors.BadRequestError('userName must be supplied'))
+  }
+  if (req.body.password === undefined) {
+    return next(new errors.BadRequestError('password must be supplied'))
+  }
+  if (req.body.created_time === undefined) {
+    return next(new errors.BadRequestError('created_time must be supplied'))
+  }
 
-  // 1. Get all patients in the system
+  var newUser = new User({
+    userId: Math.floor(Math.random() * 1000 + 1), 
+    userName: req.body.userName, 
+    password: req.body.password,
+    position: 'doctor',
+    created_time: req.body.created_time,
+    login_token: generateToken(10),
+  });
+
+  newUser.save(function (error, result) {
+    if (error) return next(new Error(JSON.stringify(error.errors)))
+    res.send(201, result)
+  })
+})
+// 2. login the system
+server.post('/users/login', function (req, res, next) {
+  console.log('POST request: /users/login');
+  User.find({userName:req.body.userName,password:req.body.password}).exec(function (error, result) {
+    if (error) return next(new Error(JSON.stringify(error.errors)))
+    res.send(result);
+  });
+})
+
+  // 3. Get all patients in the system
   server.get('/patients', function (req, res, next) {
     console.log('GET request: patients');
     // Find every entity within the given collection
@@ -121,7 +175,7 @@ var restify = require('restify')
   })
 
 
-  // 2. Get a single patient by their patient id
+  // 4. Get a single patient by their patient id
   server.get('/patients/:id', function (req, res, next) {
     console.log('GET request: patients/' + req.params.id);
 
@@ -138,7 +192,7 @@ var restify = require('restify')
   })
 
 
-  // 3. Create a new patient
+  // 5. Create a new patient
   server.post('/patients', function (req, res, next) {
     console.log('POST request: patients params=>' + JSON.stringify(req.params));
     console.log('POST request: patients body=>' + JSON.stringify(req.body));
@@ -176,7 +230,7 @@ var restify = require('restify')
     })
   })
 
-  // 4. Get a single patient records by their patient id
+  // 6. Get a single patient records by their patient id
   server.get('/patients/:id/clinical-records', function (req, res, next) {
     console.log('GET request: /patients/' + req.params.id + '/clinical-records');
 
@@ -192,7 +246,7 @@ var restify = require('restify')
     })
   })
 
-  // 5. Create a new clinical records' patient
+  // 7. Create a new clinical records' patient
   server.post('/patients/:id/clinical-records', function (req, res, next) {
     console.log('POST request: /patients/:id/clinical-records params=>' + JSON.stringify(req.params));
     console.log('POST request: /patients/:id/clinical-records body=>' + JSON.stringify(req.body));
@@ -221,7 +275,7 @@ var restify = require('restify')
     })
   })
 
-  // 6. Get all tasks of a user
+  // 8. Get all tasks of a user
   server.get('/users/:userId/tasks', function (req, res, next) {
     console.log('GET request: /tasks'+req.params.userId);
     // Find every entity within the given collection
@@ -254,7 +308,7 @@ var restify = require('restify')
       res.send(200, result)
     })
   })
-  // 7. Get one task of a user
+  // 9. Get one task of a user
   server.get('/users/:userId//tasks/:id', function (req, res, next) {
     console.log('GET request: /tasks/:id');
     Task.find({ _id: req.params.id }).exec(function (error, task) {
