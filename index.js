@@ -78,8 +78,13 @@ var restify = require('restify')
   server.listen(port, ipaddress, function () {
   console.log('Server %s listening at %s', server.name, server.url)
   console.log('Resources:')
-  console.log(' /patient')
-  console.log(' /patient/:id')
+  console.log(' GET: /patients')
+  console.log(' POST: /patients')
+  console.log(' GET: /patients/:id')
+  console.log(' GET: /patients/:id/clinical-records')
+  console.log(' POST: /patients/:id/clinical-records')
+  console.log(' GET: /tasks')
+  console.log(' GET; /tasks/:id')
 })
 
 
@@ -90,16 +95,16 @@ var restify = require('restify')
     // Maps req.body to req.params
     .use(restify.plugins.bodyParser())
     .use(
-  function crossOrigin(req,res,next){
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "X-Requested-With");
-    return next();
-  }
+      function crossOrigin(req,res,next){
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
+        return next();
+      }
 );
 
   // 1. Get all patients in the system
   server.get('/patients', function (req, res, next) {
-    console.log('GET request: patient');
+    console.log('GET request: patients');
     // Find every entity within the given collection
     Patient.find({}).exec(function (error, result) {
       if (error) return next(new Error(JSON.stringify(error.errors)))
@@ -110,7 +115,7 @@ var restify = require('restify')
 
   // 2. Get a single patient by their patient id
   server.get('/patients/:id', function (req, res, next) {
-    console.log('GET request: patient/' + req.params.id);
+    console.log('GET request: patients/' + req.params.id);
 
     // Find a single patient by their id
     Patient.find({ _id: req.params.id }).exec(function (error, patient) {
@@ -127,8 +132,8 @@ var restify = require('restify')
 
   // 3. Create a new patient
   server.post('/patients', function (req, res, next) {
-    console.log('POST request: patient params=>' + JSON.stringify(req.params));
-    console.log('POST request: patient body=>' + JSON.stringify(req.body));
+    console.log('POST request: patients params=>' + JSON.stringify(req.params));
+    console.log('POST request: patients body=>' + JSON.stringify(req.body));
     // Make first name is defined
     if (req.body.firstName === undefined) {
       // If there are any errors, pass them to next in the correct format
@@ -164,8 +169,8 @@ var restify = require('restify')
   })
 
   // 4. Get a single patient records by their patient id
-  server.get('/clinical_records/:id', function (req, res, next) {
-    console.log('GET request: clinical_records/' + req.params.id);
+  server.get('/patients/:id/clinical-records', function (req, res, next) {
+    console.log('GET request: /patients/' + req.params.id + '/clinical-records');
 
     // Find a single patient by their id
     PatientRecords.find({ patientId: req.params.id }).exec(function (error, patientRecords) {
@@ -180,9 +185,9 @@ var restify = require('restify')
   })
 
   // 5. Create a new clinical records' patient
-  server.post('/clinical_records', function (req, res, next) {
-    console.log('POST request: clinical_records params=>' + JSON.stringify(req.params));
-    console.log('POST request: clinical_records body=>' + JSON.stringify(req.body));
+  server.post('/patients/:id/clinical-records', function (req, res, next) {
+    console.log('POST request: /patients/:id/clinical-records params=>' + JSON.stringify(req.params));
+    console.log('POST request: /patients/:id/clinical-records body=>' + JSON.stringify(req.body));
     // Make patientId is defined
     if (req.body.patientId === undefined) {
       // If there are any errors, pass them to next in the correct format
