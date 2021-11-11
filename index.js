@@ -45,9 +45,9 @@ var patientSchema = new mongoose.Schema({
 });
 // Task Schema.
 var taskSchema = new mongoose.Schema({
-  taskId: Number, 
+  userId: String, 
   taskName: String, 
-  time: String,
+  time: Date,
   status:String,
 });
 
@@ -221,16 +221,16 @@ var restify = require('restify')
     })
   })
 
-  // 6. Get all tasks
+  // 6. Get all tasks of a user
   server.get('/users/:userId/tasks', function (req, res, next) {
     console.log('GET request: /tasks');
     // Find every entity within the given collection
-    Task.find({}).exec(function (error, result) {
+    Task.find({userId: req.params.userId }).exec(function (error, result) {
       if (error) return next(new Error(JSON.stringify(error.errors)))
       res.send(result);
-    });
+    })
   })
-  // 7. Get one task
+  // 7. Get one task of a user
   server.get('/users/:userId//tasks/:id', function (req, res, next) {
     console.log('GET request: /tasks/:id');
     Task.find({ _id: req.params.id }).exec(function (error, task) {
