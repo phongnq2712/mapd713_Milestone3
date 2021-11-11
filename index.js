@@ -96,6 +96,8 @@ var restify = require('restify')
   server.listen(port, ipaddress, function () {
   console.log('Server %s listening at %s', server.name, server.url)
   console.log('Resources:')
+  console.log(' POST:  /users/register')
+  console.log(' POST:  /users/login')
   console.log(' GET:  /patients')
   console.log(' POST: /patients')
   console.log(' GET:  /patients/:id')
@@ -158,6 +160,12 @@ server.post('/users/register', function (req, res, next) {
 // 2. login the system
 server.post('/users/login', function (req, res, next) {
   console.log('POST request: /users/login');
+  if (req.body.userName === undefined) {
+    return next(new errors.BadRequestError('userName must be supplied'))
+  }
+  if (req.body.password === undefined) {
+    return next(new errors.BadRequestError('password must be supplied'))
+  }
   User.find({userName:req.body.userName,password:req.body.password}).exec(function (error, result) {
     if (error) return next(new Error(JSON.stringify(error.errors)))
     res.send(result);
