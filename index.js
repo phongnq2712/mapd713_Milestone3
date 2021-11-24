@@ -133,11 +133,16 @@ function generateToken(length) {
 // 1. register in the system
 server.post('/users/register', function (req, res, next) {
   console.log('POST request: /users/register');
+  req.body = JSON.parse(req.body)
+  console.log(req.body)
   if (req.body.userName === undefined) {
     return next(new errors.BadRequestError('userName must be supplied'))
   }
   if (req.body.password === undefined) {
     return next(new errors.BadRequestError('password must be supplied'))
+  }
+  if (req.body.position === undefined) {
+    return next(new errors.BadRequestError('position must be supplied'))
   }
   if (req.body.created_time === undefined) {
     return next(new errors.BadRequestError('created_time must be supplied'))
@@ -147,7 +152,7 @@ server.post('/users/register', function (req, res, next) {
     userId: Math.floor(Math.random() * 1000 + 1), 
     userName: req.body.userName, 
     password: req.body.password,
-    position: 'doctor',
+    position: req.body.position,
     created_time: req.body.created_time,
     login_token: generateToken(10),
   });
@@ -160,6 +165,11 @@ server.post('/users/register', function (req, res, next) {
 // 2. login the system
 server.post('/users/login', function (req, res, next) {
   console.log('POST request: /users/login');
+  req.body = JSON.parse(req.body)
+  if (req.body === undefined) {
+    return next(new errors.BadRequestError('empty parameters'))
+  } 
+
   if (req.body.userName === undefined) {
     return next(new errors.BadRequestError('userName must be supplied'))
   }
@@ -167,6 +177,16 @@ server.post('/users/login', function (req, res, next) {
     return next(new errors.BadRequestError('password must be supplied'))
   }
   User.find({userName:req.body.userName,password:req.body.password}).exec(function (error, result) {
+    if (error) return next(new Error(JSON.stringify(error.errors)))
+    res.send(result);
+  });
+})
+
+//get users
+server.get('/users', function (req, res, next) {
+  console.log('GET request: users');
+  // Find every entity within the given collection
+  User.find({}).exec(function (error, result) {
     if (error) return next(new Error(JSON.stringify(error.errors)))
     res.send(result);
   });
@@ -283,17 +303,7 @@ server.post('/users/login', function (req, res, next) {
     })
   })
 
-  // 8. Get all tasks of a user
-  server.get('/users/:userId/tasks', function (req, res, next) {
-    console.log('GET request: /tasks'+req.params.userId);
-    // Find every entity within the given collection
-    Task.find({userId: req.params.userId }).exec(function (error, result) {
-      if (error) return next(new Error(JSON.stringify(error.errors)))
-      res.send(result);
-    })
-  })
-
-  //just for data insert
+  // create new task data for a user
   server.post('/users/:userId/tasks', function (req, res, next) {
     console.log('POST request: /tasks/' + req.params.userId + '/tasks');
 
@@ -316,9 +326,20 @@ server.post('/users/login', function (req, res, next) {
       res.send(200, result)
     })
   })
+
+  // 8. Get all tasks of a user
+  server.get('/users/:userId/tasks', function (req, res, next) {
+    console.log('GET request: /users/'+req.params.userId+'/tasks/');
+    // Find every entity within the given collection
+    Task.find({userId: req.params.userId }).exec(function (error, result) {
+      if (error) return next(new Error(JSON.stringify(error.errors)))
+      res.send(result);
+    })
+  })
+
   // 9. Get one task of a user
   server.get('/users/:userId/tasks/:id', function (req, res, next) {
-    console.log('GET request: /tasks/:id');
+    console.log('GET request: /users/'+ req.params.userId +'/tasks/'+ req.params.id);
     Task.find({ _id: req.params.id }).exec(function (error, task) {
       if (error) return next(new Error(JSON.stringify(error.errors)))
       if (task) {
