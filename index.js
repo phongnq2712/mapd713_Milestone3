@@ -307,7 +307,7 @@ server.get('/users', function (req, res, next) {
   // create new task data for a user
   server.post('/users/:userId/tasks', function (req, res, next) {
     console.log('POST request: /tasks/' + req.params.userId + '/tasks');
-
+    req.body = JSON.parse(req.body)
     if (req.params.userId === undefined) {
       // If there are any errors, pass them to next in the correct format
       return next(new errors.BadRequestError('useId must be supplied'))
@@ -327,6 +327,20 @@ server.get('/users', function (req, res, next) {
       res.send(200, result)
     })
   })
+
+   // delete a task for a user
+ server.del('/users/:userId/tasks/:taskId', function (req, res, next) {
+  console.log('DELETE request: /tasks/' + req.params.userId + '/tasks/'+ req.params.taskId);
+  if ((req.params.userId === undefined) || req.params.taskId === undefined) {
+    return next(new errors.BadRequestError('useId and taskId must be supplied'))
+  }
+
+  Task.deleteOne({ taskId: req.params.taskId }, function (err) {
+    if (err) return next(new Error(JSON.stringify(err.errors)))
+    res.send(200)
+  });
+})
+
 
   // 8. Get all tasks of a user
   server.get('/users/:userId/tasks', function (req, res, next) {
