@@ -93,7 +93,7 @@ var restify = require('restify')
   };
   
   
-  server.listen(port || 5000, ipaddress, function () {
+  server.listen(port || 5000, function () {
   console.log('Server %s listening at %s', server.name, server.url)
   console.log('Resources:')
   console.log(' POST:  /users/register')
