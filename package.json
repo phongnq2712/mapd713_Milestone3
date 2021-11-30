@@ -3,6 +3,9 @@
   "version": "3.0.0",
   "description": "Group9 - Milestone3",
   "main": "index.js",
+  "scripts": {
+   "start": "node index.js"
+  },
   "engines": {
     "node": ">=4.1.1",
     "npm": ">=2.1.x"
