@@ -39,7 +39,7 @@ describe("when we issue a 'GET' to "+HOST+"/patients/:id ", function(){
 });
 // 3. create a patient -> status 201
 describe("when we issue a 'POST' to "+HOST+"/patients", function(){
-    it("should return HTTP 200", function(done) {
+    it("should return HTTP 201", function(done) {
         chai.request(HOST)
             .post('/patients')
             .type('form')

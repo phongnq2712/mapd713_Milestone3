@@ -264,10 +264,11 @@ server.get('/users', function (req, res, next) {
 
     // Find a single patient by their id
     PatientRecords.find({ patientId: req.params.id }).exec(function (error, patientRecords) {
-      if (patientRecords) {
+      if (patientRecords[0]) {
         // Send the patient if no issues
         res.send(patientRecords)
       } else {
+        console.log('bbbb')
         // Send 404 header if the patient doesn't exist
         res.send(404)
       }
