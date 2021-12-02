@@ -4,7 +4,7 @@
   "description": "Group9 - Milestone3",
   "main": "index.js",
   "scripts": {
-   "start": "node index.js"
+    "start": "node index.js"
   },
   "engines": {
     "node": ">=4.1.1",
@@ -15,6 +15,8 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
     "dotenv": "^10.0.0",
     "mongoose": "=5.10.7",
     "restify": "=8.5.1"

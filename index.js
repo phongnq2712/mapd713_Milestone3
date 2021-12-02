@@ -133,8 +133,6 @@ function generateToken(length) {
 // 1. register in the system
 server.post('/users/register', function (req, res, next) {
   console.log('POST request: /users/register');
-  req.body = JSON.parse(req.body)
-  console.log(req.body)
   if (req.body.userName === undefined) {
     return next(new errors.BadRequestError('userName must be supplied'))
   }
@@ -144,16 +142,18 @@ server.post('/users/register', function (req, res, next) {
   if (req.body.position === undefined) {
     return next(new errors.BadRequestError('position must be supplied'))
   }
-  if (req.body.created_time === undefined) {
-    return next(new errors.BadRequestError('created_time must be supplied'))
-  }
+
+  let date_ob = new Date();
+  let date = ("0" + date_ob.getDate()).slice(-2);
+  let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+  let year = date_ob.getFullYear();
 
   var newUser = new User({
     userId: Math.floor(Math.random() * 1000 + 1), 
     userName: req.body.userName, 
     password: req.body.password,
     position: req.body.position,
-    created_time: req.body.created_time,
+    created_time: year + "-" + month + "-" + date,
     login_token: generateToken(10),
   });
 
@@ -165,7 +165,6 @@ server.post('/users/register', function (req, res, next) {
 // 2. login the system
 server.post('/users/login', function (req, res, next) {
   console.log('POST request: /users/login');
-  req.body = JSON.parse(req.body)
   if (req.body === undefined) {
     return next(new errors.BadRequestError('empty parameters'))
   } 
@@ -307,13 +306,19 @@ server.get('/users', function (req, res, next) {
   // create new task data for a user
   server.post('/users/:userId/tasks', function (req, res, next) {
     console.log('POST request: /tasks/' + req.params.userId + '/tasks');
-    req.body = JSON.parse(req.body)
     if (req.params.userId === undefined) {
-      // If there are any errors, pass them to next in the correct format
       return next(new errors.BadRequestError('useId must be supplied'))
     }
+    if (req.body.taskName === undefined) {
+      return next(new errors.BadRequestError('taskName must be supplied'))
+    }
+    if (req.body.time === undefined) {
+      return next(new errors.BadRequestError('time must be supplied'))
+    }
+    if (req.body.status === undefined) {
+      return next(new errors.BadRequestError('status must be supplied'))
+    }
     
-    // Creating new clinical records.
     var newTasks = new Task({
       userId: req.params.userId,
       taskName: req.body.taskName,
@@ -324,7 +329,7 @@ server.get('/users', function (req, res, next) {
     newTasks.save(function (error, result) {
       if (error) return next(new Error(JSON.stringify(error.errors)))
   
-      res.send(200, result)
+      res.send(201, result)
     })
   })
 
@@ -335,9 +340,9 @@ server.get('/users', function (req, res, next) {
     return next(new errors.BadRequestError('useId and taskId must be supplied'))
   }
 
-  Task.deleteOne({ taskId: req.params.taskId }, function (err) {
+  Task.deleteOne({ _id: req.params.taskId }, function (err) {
     if (err) return next(new Error(JSON.stringify(err.errors)))
-    res.send(200)
+    res.send(200, {msg:'delete successfully'})
   });
 })
 
