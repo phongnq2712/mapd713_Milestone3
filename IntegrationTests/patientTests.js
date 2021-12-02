@@ -9,50 +9,51 @@ dotenv.config()
 var PORT = process.env.PORT;
 var IP = process.env.IP;
 var HOST = process.env.HEROKU_HOST;
+//var HOST = 'http://'+IP+':'+PORT;
+
+let patientId = '6179c2450c1cd71d6a8c5e50'
 
 
-// register 
-// describe("when we issue a 'POST' to "+HOST+"/users/register ", function(){
-//     it("should return HTTP 200", function(done) {
-//         chai.request(HOST)
-//             .post('/users/register')
-//             .type('form')
-//             .send({
-//                 'userName': 'chai_test',
-//                 'password': '123456',
-//                 'position': 'doctor'
-//             })
-//             .end(function(req, res){
-//                 expect(res.status).to.equal(201);
-//                 done();
-//             });
-//     });
-// });
-
-// // login 
-// describe("when we issue a 'POST' to "+HOST+"/users/login ", function(){
-//     it("should return HTTP 200", function(done) {
-//         chai.request(HOST)
-//             .post('/users/login')
-//             .type('form')
-//             .send({
-//                 'userName': 'greg',
-//                 'password': '123456'
-//             })
-//             .end(function(req, res){
-//                 expect(res.status).to.equal(200);
-//                 done();
-//             });
-//     });
-// });
-
-// patient list 
+// 1. get patient list -> status 200
 describe("when we issue a 'GET' to "+HOST+"/patients ", function(){
     it("should return HTTP 200", function(done) {
         chai.request(HOST)
             .get('/patients')
             .query().end(function(req, res){
                 expect(res.status).to.equal(200);
+                done();
+            });
+    });
+});
+// 2. get one patient -> status 200
+describe("when we issue a 'GET' to "+HOST+"/patients/:id ", function(){
+    it("should return HTTP 200", function(done) {
+        chai.request(HOST)
+            .get('/patients/'+patientId)
+            .query()
+            .end(function(req, res){
+                expect(res.status).to.equal(200);
+                done();
+            });
+    });
+});
+// 3. create a patient -> status 201
+describe("when we issue a 'POST' to "+HOST+"/patients", function(){
+    it("should return HTTP 200", function(done) {
+        chai.request(HOST)
+            .post('/patients')
+            .type('form')
+            .send({
+                'firstName': 'Kari',
+                'lastName': 'Lesotho',
+                'age': '77',
+                'gender':'Male',
+                'healthInsuranceNo':'HI90123',
+                'phoneNo':'4168370648',
+                'email': 'ksa@gmail.com'
+            })
+            .end(function(req, res){
+                expect(res.status).to.equal(201);
                 done();
             });
     });

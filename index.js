@@ -224,7 +224,7 @@ server.get('/users', function (req, res, next) {
     console.log('POST request: patients params=>' + JSON.stringify(req.params));
     console.log('POST request: patients body=>' + JSON.stringify(req.body));
     // Make first name is defined
-    req.body = JSON.parse(req.body)
+    //req.body = JSON.parse(req.body)
     if (req.body.firstName === undefined) {
       // If there are any errors, pass them to next in the correct format
       return next(new errors.BadRequestError('firstName must be supplied'))
